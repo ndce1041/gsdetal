@@ -30,25 +30,46 @@ namespace gsdetal.Services.Implementations
         }
 
         // 更新商品详情
-        public void UpdateItemDetailByUrl(List<Itemdetail> itemdetails)
+        public void UpdateItemDetail(Itemdetail itemdetail)
         {
-            foreach (var itemdetail in itemdetails)
-            {
-                var existingItemdetail = _context.Itemdetails.Find(itemdetail.url);
-                if (existingItemdetail != null)
-                {
-                    existingItemdetail.color = itemdetail.color;
-                    existingItemdetail.size = itemdetail.size;
-                    existingItemdetail.state = itemdetail.state;
-                    existingItemdetail.thumbnailurl = itemdetail.thumbnailurl;
-                    existingItemdetail.thumbnailpath = itemdetail.thumbnailpath;
-                    existingItemdetail.tip = itemdetail.tip;
-                    existingItemdetail.temp = itemdetail.temp;
+            /// 以url,color, size 属性查询是否存在此组合 如果存在则更新，不存在则添加，更新只更新不为空的字段
 
-                    _context.Itemdetails.Update(existingItemdetail);
+
+            var existingItem = _context.Itemdetails
+                .FirstOrDefault(i => i.url == itemdetail.url && i.color == itemdetail.color && i.size == itemdetail.size);
+
+            if (existingItem != null)
+            {
+                // 更新不为空的字段
+                if (!string.IsNullOrEmpty(itemdetail.state))
+                {
+                    existingItem.state = itemdetail.state;
+                }
+                if (!string.IsNullOrEmpty(itemdetail.thumbnailurl))
+                {
+                    existingItem.thumbnailurl = itemdetail.thumbnailurl;
+                }
+                if (!string.IsNullOrEmpty(itemdetail.thumbnailpath))
+                {
+                    existingItem.thumbnailpath = itemdetail.thumbnailpath;
+                }
+                if (!string.IsNullOrEmpty(itemdetail.tip))
+                {
+                    existingItem.tip = itemdetail.tip;
+                }
+                if (!string.IsNullOrEmpty(itemdetail.temp))
+                {
+                    existingItem.temp = itemdetail.temp;
                 }
             }
+            else
+            {
+                // 添加新项
+                _context.Itemdetails.Add(itemdetail);
+            }
+            
             _context.SaveChanges();
+
         }
 
         // 更新商品备注

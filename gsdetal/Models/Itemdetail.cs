@@ -11,7 +11,10 @@ namespace gsdetal.Models
 {
     public class Itemdetail
     {
+
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }  // 自增主键
         public string url { get; set; }
         public string color { get; set; }  // 颜色
         public string size { get; set; }  // 尺码

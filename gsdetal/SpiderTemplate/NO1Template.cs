@@ -21,9 +21,8 @@ namespace gsdetal.SpiderTemplate
         public override async Task AnalyseBody(string body,IUrlService urlService, IItemdetailService itemService)
         {
             // 解析页面内容
-
             var parser = new HtmlParser();
-            var document = parser.ParseDocument(body);
+            var document = await parser.ParseDocumentAsync(body);
 
             //Logger.Info("start parse");
 
@@ -41,6 +40,8 @@ namespace gsdetal.SpiderTemplate
             if (info_percolor == null) { throw new Exception("no percolor info"); }
 
             
+
+            ///构造数据行
             Url urlinf = new();
             urlinf.url = _url;
             urlinf.price = prise == null ? null : tools.TraverseAndConcatenateText(prise);
@@ -52,9 +53,11 @@ namespace gsdetal.SpiderTemplate
             //////////////////////////
 
 
+
+
+
+
             // percolor -- persize
-            Pertype typ;
-            ansJson += "for begin\n";
             foreach (var element in info_percolor)
             {
                 // get color
@@ -63,8 +66,6 @@ namespace gsdetal.SpiderTemplate
                 {
                     continue;
                 }
-                typ = new();
-                typ.Style = color_info;
 
 
                 // get size list
@@ -73,19 +74,23 @@ namespace gsdetal.SpiderTemplate
 
                 foreach (var size in sizes)
                 {
-                    Persize sz = new();
-                    sz.Size = size.QuerySelector(".size")?.TextContent;
-                    sz.State = size.QuerySelector("dd.zaiko")?.QuerySelector("span")?.TextContent;
-                    sz.Soldtime = size.QuerySelector("span.shippingdate")?.TextContent;
 
-                    typ.ps.Add(sz);
+                    Itemdetail item = new();
+
+                    // 填入数据
+                    item.url = _url;
+                    item.color = color_info;
+                    item.size = size.QuerySelector(".size")?.TextContent;
+                    item.state = size.QuerySelector("dd.zaiko")?.QuerySelector("span")?.TextContent;
+                    item.thumbnailurl = size.QuerySelector("img")?.GetAttribute("src");  // 需要修改
+                    item.thumbnailpath = null;  // 缩略图路径 没有表示尚未缓存
+                    item.tip = null;  // 备注
+                    item.temp = null;  // 临时变量
+
+
+                    itemService.UpdateItemDetail(item);  /// ！！更新item信息
                 }
-
-
-                item.Pt.Add(typ);
             }
-            ansJson += "end\n"; //+ JsonSerializer.Serialize(items);
-            items.Add(item);
         }
 
 
@@ -94,5 +99,5 @@ namespace gsdetal.SpiderTemplate
 
         // 保存到数据库
     }
-    }
+    
 }
