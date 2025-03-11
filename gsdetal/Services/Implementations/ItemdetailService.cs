@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using gsdetal.DBViewModel;
 using gsdetal.Models;
 
+
 namespace gsdetal.Services.Implementations
 {
     internal class ItemdetailService : IItemdetailService
@@ -34,9 +35,20 @@ namespace gsdetal.Services.Implementations
         {
             /// 以url,color, size 属性查询是否存在此组合 如果存在则更新，不存在则添加，更新只更新不为空的字段
 
+            Itemdetail? existingItem;
 
-            var existingItem = _context.Itemdetails
-                .FirstOrDefault(i => i.url == itemdetail.url && i.color == itemdetail.color && i.size == itemdetail.size);
+            // 如果存在id
+            if (itemdetail != null)
+            {
+                existingItem = _context.Itemdetails.FirstOrDefault(i => i.Id == itemdetail.Id);
+            }
+            else
+            {
+                existingItem = _context.Itemdetails
+    .FirstOrDefault(i => i.url == itemdetail.url && i.color == itemdetail.color && i.size == itemdetail.size);
+            }
+
+
 
             if (existingItem != null)
             {
@@ -65,12 +77,24 @@ namespace gsdetal.Services.Implementations
             else
             {
                 // 添加新项
-                _context.Itemdetails.Add(itemdetail);
+
+                // 判断 是否存在此三项
+                if (itemdetail.url != null && itemdetail.color != null && itemdetail.size != null)
+                {
+                    _context.Itemdetails.Add(itemdetail);
+                }
+                else
+                {
+                    // 不合法的项
+                    // log
+                }
             }
             
             _context.SaveChanges();
 
         }
+
+
 
         // 更新商品备注
         public void UpdateTipByUrl(string tip)
@@ -90,6 +114,21 @@ namespace gsdetal.Services.Implementations
             _context.Itemdetails.RemoveRange(itemdetails);
             _context.SaveChanges();
         }
+
+
+        // 获取缩略图位置为空的 id + 缩略图url 其余字段为空 不取
+        public List<Itemdetail> GetItemThatEmpty()
+        {
+            return _context.Itemdetails.Select(item => new Itemdetail
+            {
+                Id = item.Id,
+                thumbnailurl = item.thumbnailurl,
+            }).Where(i => string.IsNullOrEmpty(i.thumbnailpath)).ToList();
+
+        }
+
+
+
     }
 }
 

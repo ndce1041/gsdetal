@@ -22,5 +22,7 @@ namespace gsdetal.Services
         public void UpdateTipByUrl(String tip);  // 更新商品备注
         // delete
         public void DeleteItemDetailByUrl(List<String> urls);  // 删除商品详情
+
+        public List<Itemdetail> GetItemThatEmpty(); // 获取缩略图位置为空的 id + 缩略图url
     }
 }

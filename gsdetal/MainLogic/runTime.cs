@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace gsdetal.MainLogic
 {
-    // 用来管理数据库的类
-    // 使用localdb
-    class dbManage
+    class runTime
     {
-
-
-
+        /// 定义启动 爬取 资源准备 展示
     }
 }

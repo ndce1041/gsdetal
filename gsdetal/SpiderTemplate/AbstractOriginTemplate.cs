@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using gsdetal.Commands;
 using gsdetal.DBViewModel;
+using gsdetal.Models;
 using gsdetal.Services;
 using gsdetal.Services.Implementations;
 
@@ -19,6 +20,8 @@ namespace gsdetal.SpiderTemplate
         protected IUrlService _urlService;
         static HttpClient? client;
 
+        public Itemdetail? tochange;   // 保存当前正在处理的itemdetail   可传入方便修改半成品
+
         protected string _url;
 
         protected AbstractOriginTemplate()
@@ -26,6 +29,9 @@ namespace gsdetal.SpiderTemplate
             var dbcontext = new MyDBContext();
             _itemService = new ItemdetailService(dbcontext); 
             _urlService = new UrlService(dbcontext);
+
+
+
         }
 
         protected HttpClient GetHttpClient()
@@ -57,9 +63,10 @@ namespace gsdetal.SpiderTemplate
 
 
 
-        public async Task<string> GetBody(string url)
+        public virtual async Task<Object> GetBody(string url)
         {
             /// 必要时可以重写这个方法
+        
 
             HttpClient client = GetHttpClient();
             var response = await client.GetAsync(url);
@@ -75,14 +82,31 @@ namespace gsdetal.SpiderTemplate
                 return "";
             }
         }
-        public abstract Task AnalyseBody(string body ,IUrlService urlService, IItemdetailService itemService);
+        public abstract Task AnalyseBody(Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);
         /// <summary>
         /// 解析页面内容并保存
+        /// tochange 为传入的可能附带信息的itemdetail 当只传入url时为null
         /// </summary>
         /// <returns></returns>
         public async Task Run()
         {
-            await AnalyseBody(await GetBody(_url),_urlService,_itemService);
+
+            if (tochange == null)
+            {
+                await AnalyseBody(await GetBody(_url), null, _urlService, _itemService);
+            }
+            else
+            {
+                await AnalyseBody(await GetBody(tochange.url), tochange, _urlService, _itemService);
+            }
+
+
+        }
+
+        public Func<Task> GetTask(Itemdetail itemdetail)
+        {
+            tochange = itemdetail;
+            return Run;
         }
 
         public Func<Task> GetTask(string url)
@@ -90,5 +114,6 @@ namespace gsdetal.SpiderTemplate
             _url = url;
             return Run;
         }
+
     }
 }

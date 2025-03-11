@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using gsdetal.DBViewModel;
 using gsdetal.Models;
 using gsdetal.Services;
+using gsdetal.Services.Implementations;
 
 namespace gsdetal.MainLogic
 {
     internal class urlManage
     {
-        private readonly IUrlService _urlService;
+        private static IUrlService _urlService = new UrlService(new MyDBContext());
 
         // 正则表达式 为url匹配模板
         static List<List<string>> TemplateList = [
@@ -20,9 +21,8 @@ namespace gsdetal.MainLogic
 
 
 
-        public urlManage(IUrlService urlService)
+        public urlManage()
         {
-            _urlService = urlService;
         }
 
         /// <summary>

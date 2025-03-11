@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace gsdetal.Models
 {
+    [Index(nameof(url), nameof(color), nameof(size), IsUnique = true)]
     public class Itemdetail
     {
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }  // 自增主键

@@ -31,6 +31,13 @@ using System.Security.Policy;
 using gsdetal.MainLogic;
 using gsdetal.MainViewModel;
 
+using gsdetal.SpiderTemplate;
+using gsdetal.Models;
+using gsdetal.Services;
+using gsdetal.Services.Implementations;
+
+using gsdetal.DBViewModel;
+
 namespace gsdetal
 {
     /// <summary>
@@ -51,6 +58,42 @@ namespace gsdetal
             InitializeComponent();
             MainViewModel.MainViewModel mainViewModel = new();
             this.DataContext = mainViewModel;
+
+            MyDBContext context = new();
+            IItemdetailService itemService = new ItemdetailService(context);
+            IUrlService urlService = new UrlService(context);
+
+
+            // 测试
+            var urlstr = "https://itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
+
+
+
+
+            IOriginTemplate template = new ThumbnailTemplate();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             //Items = new ObservableCollection<Peritem>();
 
@@ -109,7 +152,7 @@ namespace gsdetal
             //}
         }
 
-        
+
 
         //private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         //{
