@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using AngleSharp;
 using AngleSharp.Css;
 
+using gsdetal.Models;
 
 
 namespace gsdetal.MainLogic
@@ -109,7 +110,7 @@ namespace gsdetal.MainLogic
             var parser = new HtmlParser();
             var document = parser.ParseDocument(body);
 
-            Logger.Info("start parse");
+            //Logger.Info("start parse");
 
             var item_detail = document.QuerySelector(".item_detail_box");
             if (item_detail == null)

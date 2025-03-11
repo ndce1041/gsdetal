@@ -23,5 +23,7 @@ namespace gsdetal.SpiderTemplate
         public Task Run();  // 运行爬虫
 
         public Func<Task> GetTask(Itemdetail itemdetail);  //输出为Task
+
+        public Func<Task> GetTask(string url);  //输出为Task
     }
 }

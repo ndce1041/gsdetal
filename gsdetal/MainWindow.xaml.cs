@@ -55,9 +55,9 @@ namespace gsdetal
         public string log = "log:\n";
         public MainWindow()
         {
-            InitializeComponent();
-            MainViewModel.MainViewModel mainViewModel = new();
-            this.DataContext = mainViewModel;
+            //InitializeComponent();
+            //MainViewModel.MainViewModel mainViewModel = new();
+            //this.DataContext = mainViewModel;
 
             MyDBContext context = new();
             IItemdetailService itemService = new ItemdetailService(context);
@@ -65,12 +65,27 @@ namespace gsdetal
 
 
             // 测试
-            var urlstr = "https://itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
+            var picurlstr = "//itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
 
 
+            var mainurl = "https://runway-webstore.com/ap/item/i/m/0124503006";
 
 
-            IOriginTemplate template = new ThumbnailTemplate();
+            IOriginTemplate template = new ThumbnailTemplate("debug");
+
+            IOriginTemplate No1Template = new NO1Template("debug");
+
+            //Func<Task> task = No1Template.GetTask(mainurl);
+
+            //No1Template.Run();
+
+            Itemdetail itl = new Itemdetail();
+            itl.thumbnailurl = picurlstr;
+
+            template.GetTask(itl)();
+
+
+            Console.WriteLine("end");
 
 
 

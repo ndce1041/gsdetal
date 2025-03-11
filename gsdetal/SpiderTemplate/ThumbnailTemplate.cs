@@ -21,11 +21,23 @@ namespace gsdetal.SpiderTemplate
         /// 
 
         string filetype;
-        string PATH = "images";
+        string PATH = "Static";
+
+
+        bool isDebug = false;
 
         public ThumbnailTemplate() : base() {
             
         }
+
+        public ThumbnailTemplate(string debug) : base()
+        {
+            if (debug == "debug")
+            {
+                isDebug = true;
+            }
+        }
+
 
         public override async Task<object> GetBody(string url)
         {
@@ -34,7 +46,7 @@ namespace gsdetal.SpiderTemplate
                 throw new ArgumentNullException(nameof(tochange));
             }
             url = tochange.thumbnailurl;
-
+            //url = "https:" + url;
             var client = GetHttpClient();
             var response = await client.GetAsync(url);
 
@@ -71,6 +83,15 @@ namespace gsdetal.SpiderTemplate
             {
                 throw new ArgumentNullException(nameof(body));
             }
+
+            // 检测文件夹是否存在
+            if (!Directory.Exists(PATH))
+            {
+                Directory.CreateDirectory(PATH);
+            }
+
+
+
             // 以时间戳 + 随机数命名
             string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}-{new Random().Next(1000, 9999)}.{filetype}";
             string filePath = "./" + PATH + "/" + fileName;
@@ -80,8 +101,15 @@ namespace gsdetal.SpiderTemplate
 
             tochange.thumbnailpath = filePath;
 
+            if (isDebug)
+            {
+                Console.WriteLine("Thumbnail saved to " + filePath);
+            }
+            else
+            {
+                itemService.UpdateItemDetail(tochange);
+            }
 
-            itemService.UpdateItemDetail(tochange);
 
 
         }

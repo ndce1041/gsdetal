@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using gsdetal.Services;
 using AngleSharp.Html.Parser;
 using gsdetal.Models;
+using System.Diagnostics;
 
 namespace gsdetal.SpiderTemplate
 {
@@ -13,9 +14,17 @@ namespace gsdetal.SpiderTemplate
     {
 
         SpiderTools tools = new SpiderTools();
+        bool Debug = false;
+        public NO1Template(string? Runtype) : base()
+        {
+            if (Runtype == "debug")
+            {
+                Debug = true;
+            }
+        }
+
         public NO1Template() : base()
         {
-            
         }
 
         public override async Task AnalyseBody(Object body,Itemdetail? tochage,IUrlService urlService, IItemdetailService itemService)
@@ -49,7 +58,19 @@ namespace gsdetal.SpiderTemplate
             urlinf.title = name == null ? null : name.TextContent;
             urlinf.status = state == null ? null : tools.TraverseAndConcatenateText(state);
 
-            urlService.UpdateUrl(urlinf);  /// ！！更新url信息
+
+            if(Debug)
+            {
+                Console.WriteLine("url: " + urlinf.url);
+                Console.WriteLine("price: " + urlinf.price);
+                Console.WriteLine("title: " + urlinf.title);
+                Console.WriteLine("status: " + urlinf.status);
+            }
+            else
+            {
+                urlService.UpdateUrl(urlinf);  /// ！！更新url信息
+            }
+            
 
             //////////////////////////
 
@@ -83,13 +104,20 @@ namespace gsdetal.SpiderTemplate
                     item.color = color_info;
                     item.size = size.QuerySelector(".size")?.TextContent;
                     item.state = size.QuerySelector("dd.zaiko")?.QuerySelector("span")?.TextContent;
-                    item.thumbnailurl = size.QuerySelector("img")?.GetAttribute("src");  // 需要修改
+                    item.thumbnailurl = "https:" + element.QuerySelector("img")?.GetAttribute("src");  
                     item.thumbnailpath = null;  // 缩略图路径 没有表示尚未缓存
                     item.tip = null;  // 备注
                     item.temp = null;  // 临时变量
 
+                    if (Debug)
+                    {
 
-                    itemService.UpdateItemDetail(item);  /// ！！更新item信息
+                        item.url = "";
+                    }
+                    else
+                    {
+                        itemService.UpdateItemDetail(item);  /// ！！更新item信息
+                    }
                 }
             }
         }
