@@ -36,14 +36,6 @@ namespace gsdetal.SpiderTemplate.Imple
 
         }
 
-        public ThumbnailTemplate(string debug) : base()
-        {
-            _thumbnailService = new ThumbnailService(dbcontext);
-            if (debug == "debug")
-            {
-                isDebug = true;
-            }
-        }
 
 
         public override async Task<object> GetBody(string url)
@@ -82,7 +74,7 @@ namespace gsdetal.SpiderTemplate.Imple
 
 
 
-        public override async Task AnalyseBody(string _url, object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService)
+        public override async Task AnalyseBody(string _url, object body, IUrlService urlService, IItemdetailService itemService)
         {
             /// 保存缩略图并更新数据库
             /// 

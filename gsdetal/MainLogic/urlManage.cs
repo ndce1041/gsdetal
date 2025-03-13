@@ -54,13 +54,7 @@ namespace gsdetal.MainLogic
         {
             // 处理URL 去除多余的空格 切除参数部分
             url = url.Trim();
-            if (!string.IsNullOrEmpty(url)) {
-                var index = url.IndexOf("?");
-                if (index > 0)
-                {
-                    url = url.Substring(0, index);
-                }
-            }
+            
 
             // 判断URL是否已经存在
             if (_urlService.IsUrlExist(url))

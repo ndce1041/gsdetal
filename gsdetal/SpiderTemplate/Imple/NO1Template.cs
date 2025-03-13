@@ -12,33 +12,38 @@ namespace gsdetal.SpiderTemplate.Imple
 {
     internal class NO1Template : AbstractOriginTemplate
     {
-        public override string Match { get; set; } = @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$";
+        public override string Match { get; set; } = @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$";   // 重要标识符  自身对应url的正则表达式  需要排除冗余信息
+        public override string TemplateName { get; set; } = "NO1";   // 重要标识符  模板名称 可以任意取 但是要保证唯一性
 
-        public override string TemplateName { get; set; } = "NO1";
+        SpiderTools tools = new SpiderTools();    // 工具类   其中只有一个方法  TraverseAndConcatenateText  用于遍历节点并拼接文本  当信息分散在层次结构中时使用
 
-        SpiderTools tools = new SpiderTools();
-        bool Debug = false;
-        public NO1Template(string? Runtype) : base()
+
+        public NO1Template() : base() { }  // 构造函数
+
+        /// <summary>
+        /// 解析页面内容
+        /// </summary>
+        /// <param name="_url">目标url,作为主键与其他信息存储在数据库</param>
+        /// <param name="body">一般为string 需要显示转换</param>
+        /// <param name="urlService">对于url模型的数据库存储服务</param>
+        /// <param name="itemService">对于item模型的数据库存储服务</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public override async Task AnalyseBody(string _url ,object body,IUrlService urlService, IItemdetailService itemService)
         {
-            if (Runtype == "debug")
-            {
-                Debug = true;
-            }
-        }
+            
 
-        public NO1Template() : base()
-        {
-        }
 
-        public override async Task AnalyseBody(string _url ,object body,Itemdetail? tochage,IUrlService urlService, IItemdetailService itemService)
-        {
             // 解析页面内容
-
             var parser = new HtmlParser();
             var document = await parser.ParseDocumentAsync((string)body);
 
-            //Logger.Info("start parse");
+            //Logger.Info("start parse");   // 需要加入日志 用于调试
 
+
+
+
+            // 商品基础信息  记录在url中
             var item_detail = document.QuerySelector(".item_detail_box");
             if (item_detail == null)
             {
@@ -62,18 +67,9 @@ namespace gsdetal.SpiderTemplate.Imple
             urlinf.status = state == null ? null : tools.TraverseAndConcatenateText(state);
 
 
-            if(Debug)
-            {
-                Console.WriteLine("url: " + urlinf.url);
-                Console.WriteLine("price: " + urlinf.price);
-                Console.WriteLine("title: " + urlinf.title);
-                Console.WriteLine("status: " + urlinf.status);
-            }
-            else
-            {
-                urlService.UpdateUrl(urlinf);  /// ！！更新url信息
-            }
-            
+            urlService.UpdateUrl(urlinf);  /// ！！更新url信息
+
+
 
             //////////////////////////
 
@@ -82,17 +78,11 @@ namespace gsdetal.SpiderTemplate.Imple
 
 
 
-            // percolor -- persize
+            //商品详细信息  每个颜色-尺码组合为一个数据行
             foreach (var element in info_percolor)
             {
                 // get color
                 var color_info = element.QuerySelector("dd")?.TextContent;
-                if (color_info == null)
-                {
-                    continue;
-                }
-
-
                 // get size list
                 var sizes = element.QuerySelector(".choose_item")?.QuerySelectorAll("li");
                 if (sizes == null) { continue; };
@@ -107,29 +97,18 @@ namespace gsdetal.SpiderTemplate.Imple
                     item.color = color_info;
                     item.size = size.QuerySelector(".size")?.TextContent;
                     item.state = size.QuerySelector("dd.zaiko")?.QuerySelector("span")?.TextContent;
-                    item.thumbnailurl = "https:" + element.QuerySelector("img")?.GetAttribute("src");  
-                    item.thumbnailpath = null;  // 缩略图路径 没有表示尚未缓存
-                    item.tip = null;  // 备注
-                    item.temp = null;  // 临时变量
+                    item.thumbnailurl = "https:" + element.QuerySelector("img")?.GetAttribute("src");   // 缩略图url 可能有省略 需要补全为正常url格式   为每个颜色对应的缩略图
+                    item.thumbnailpath = null;  // 缩略图路径 一定为空
+                    item.tip = null;  // 备注  一定为空
+                    item.temp = null;  // 临时变量 一定为空
 
-                    if (Debug)
-                    {
 
-                        item.url = "";
-                    }
-                    else
-                    {
-                        itemService.UpdateItemDetail(item);  /// ！！更新item信息
-                    }
+                    itemService.UpdateItemDetail(item);  /// ！！更新item信息
+                   
                 }
             }
         }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-
-
-
-
-        // 保存到数据库
     }
     
 }

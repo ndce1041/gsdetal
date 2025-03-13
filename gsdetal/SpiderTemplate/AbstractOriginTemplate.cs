@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using gsdetal.Commands;
@@ -72,7 +73,16 @@ namespace gsdetal.SpiderTemplate
         public virtual async Task<Object> GetBody(string url)
         {
             /// 必要时可以重写这个方法
-        
+
+            // 用MATH正则表达式匹配url  并获取匹配的字符段
+            MatchCollection matches = Regex.Matches(url, Match);
+            if (matches.Count == 0)
+            {
+                throw new Exception("URL不匹配");
+            }
+            string match = matches[0].Value;
+            url = match;
+
 
             HttpClient client = GetHttpClient();
             var response = await client.GetAsync(url);
@@ -88,7 +98,7 @@ namespace gsdetal.SpiderTemplate
                 return "";
             }
         }
-        public abstract Task AnalyseBody(string _url ,Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);
+        public abstract Task AnalyseBody(string _url ,Object body, IUrlService urlService, IItemdetailService itemService);
         /// <summary>
         /// 解析页面内容并保存
         /// tochange 为传入的可能附带信息的itemdetail 当只传入url时为null
@@ -96,22 +106,7 @@ namespace gsdetal.SpiderTemplate
         /// <returns></returns>
 
 
-        public Func<Task> GetTask(Itemdetail itemdetail)
-        {
 
-            return async () =>
-            {
-                await semaphore.WaitAsync(); // 异步等待锁
-                try
-                {
-                    await AnalyseBody( null,await GetBody(itemdetail.url), itemdetail, _urlService, _itemService);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            };
-        }
 
         public Func<Task> GetTask(string url)
         {
@@ -120,7 +115,7 @@ namespace gsdetal.SpiderTemplate
                 await semaphore.WaitAsync(); // 异步等待锁
                 try
                 {
-                    await AnalyseBody(url,await GetBody(url),null, _urlService, _itemService);
+                    await AnalyseBody(url,await GetBody(url), _urlService, _itemService);
                 }
                 finally
                 {

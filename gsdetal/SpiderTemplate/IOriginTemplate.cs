@@ -22,11 +22,10 @@ namespace gsdetal.SpiderTemplate
 
         public Task<Object> GetBody(string url);  // 根据url获取页面内容
 
-        public Task AnalyseBody(string _url, Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);  // 根据html解析页面内容 同时保存
+        public Task AnalyseBody(string _url, Object body, IUrlService urlService, IItemdetailService itemService);  // 根据html解析页面内容 同时保存
 
         //public Task Run();  // 运行爬虫
 
-        public Func<Task> GetTask(Itemdetail itemdetail);  //输出为Task
 
         public Func<Task> GetTask(string url);  //输出为Task
     }
