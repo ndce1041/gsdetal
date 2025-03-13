@@ -16,11 +16,15 @@ namespace gsdetal.SpiderTemplate
         ///
         /// </summary>
         /// <param name="url"></param>
+        
+        string Match { get; set; }  // 匹配url的正则表达式
+        string TemplateName { get; set; }  // 模板名称
+
         public Task<Object> GetBody(string url);  // 根据url获取页面内容
 
-        public Task AnalyseBody(Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);  // 根据html解析页面内容 同时保存
+        public Task AnalyseBody(string _url, Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);  // 根据html解析页面内容 同时保存
 
-        public Task Run();  // 运行爬虫
+        //public Task Run();  // 运行爬虫
 
         public Func<Task> GetTask(Itemdetail itemdetail);  //输出为Task
 

@@ -15,14 +15,16 @@ namespace gsdetal.MainLogic
         private static IUrlService _urlService = new UrlService(new MyDBContext());
 
         // 正则表达式 为url匹配模板
-        static List<List<string>> TemplateList = [
-            [@"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$","NO1"]
-            ];
+        public Dictionary<string, string> TemplateDict;
+        //{
+        //    { "NO1", @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$"}
+        //};
 
 
 
-        public urlManage()
+        public urlManage(Dictionary<string, string> keyValuePairs)
         {
+            TemplateDict = keyValuePairs;
         }
 
         /// <summary>
@@ -60,13 +62,21 @@ namespace gsdetal.MainLogic
                 }
             }
 
+            // 判断URL是否已经存在
+            if (_urlService.IsUrlExist(url))
+            {
+                // TODO URL已经存在 触发通知
+                return;
+            }
+
+
             string templatetype = string.Empty;
-            foreach (var item in TemplateList)
+            foreach (var item in TemplateDict)
             {
                 // 使用template匹配url
-                if (Regex.IsMatch(url, item[0]))
+                if (Regex.IsMatch(url, item.Value))
                 {
-                    templatetype = item[1];
+                    templatetype = item.Key;
                     break;
                 }
             }
@@ -86,12 +96,16 @@ namespace gsdetal.MainLogic
                 type = string.Empty,
                 price = string.Empty,
                 status = string.Empty,
-                updatetime = DateOnly.FromDateTime(DateTime.Now).ToString()
             };
             _urlService.AddUrl(newUrl);
+
+
+            // TODO 通知爬虫工作器添加新的任务
+
+
         }
 
-        
+
 
         /// <summary>
         /// 更新现有的URL

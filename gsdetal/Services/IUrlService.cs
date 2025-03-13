@@ -19,5 +19,7 @@ namespace gsdetal.Services
         public void UpdateUrl(Url url);  // 更新url
 
         public void RemoveUrl(String url);
+
+        public bool IsUrlExist(String url);
     }
 }

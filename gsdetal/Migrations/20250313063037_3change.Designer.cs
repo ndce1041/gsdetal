@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using gsdetal.DBViewModel;
 
@@ -10,9 +11,11 @@ using gsdetal.DBViewModel;
 namespace gsdetal.Migrations
 {
     [DbContext(typeof(MyDBContext))]
-    partial class MyDBcontentModelSnapshot : ModelSnapshot
+    [Migration("20250313063037_3change")]
+    partial class _3change
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -56,19 +59,6 @@ namespace gsdetal.Migrations
                         .IsUnique();
 
                     b.ToTable("Itemdetails", (string)null);
-                });
-
-            modelBuilder.Entity("gsdetal.Models.Thumbnail", b =>
-                {
-                    b.Property<string>("thumbnailurl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("thumbnailpath")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("thumbnailurl");
-
-                    b.ToTable("Thumbnails", (string)null);
                 });
 
             modelBuilder.Entity("gsdetal.Models.Url", b =>

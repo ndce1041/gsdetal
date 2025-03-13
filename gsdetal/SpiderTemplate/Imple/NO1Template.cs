@@ -8,10 +8,13 @@ using AngleSharp.Html.Parser;
 using gsdetal.Models;
 using System.Diagnostics;
 
-namespace gsdetal.SpiderTemplate
+namespace gsdetal.SpiderTemplate.Imple
 {
     internal class NO1Template : AbstractOriginTemplate
     {
+        public override string Match { get; set; } = @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$";
+
+        public override string TemplateName { get; set; } = "NO1";
 
         SpiderTools tools = new SpiderTools();
         bool Debug = false;
@@ -27,7 +30,7 @@ namespace gsdetal.SpiderTemplate
         {
         }
 
-        public override async Task AnalyseBody(Object body,Itemdetail? tochage,IUrlService urlService, IItemdetailService itemService)
+        public override async Task AnalyseBody(string _url ,object body,Itemdetail? tochage,IUrlService urlService, IItemdetailService itemService)
         {
             // 解析页面内容
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using gsdetal.DBViewModel;
 using gsdetal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace gsdetal.Services.Implementations
 {
@@ -35,8 +36,7 @@ namespace gsdetal.Services.Implementations
         // 添加url
         public void AddUrl(Url url)
         {
-            _context.Urls.Add(url);
-            _context.SaveChanges();
+            UpdateUrl(url);
         }
 
         // 更新url
@@ -52,10 +52,27 @@ namespace gsdetal.Services.Implementations
                 if (url.type != null) { existingUrl.type = url.type; }
                 if (url.price != null) { existingUrl.price = url.price; }
                 if (url.status != null) { existingUrl.status = url.status; }
-                existingUrl.updatetime = url.updatetime;
+                existingUrl.updatetime = DateTime.Now;
 
 
                 _context.Urls.Update(existingUrl);
+                _context.Entry(existingUrl).State = EntityState.Modified;
+
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
+
+            }
+            else
+            {
+                // 添加新项
+                url.updatetime = DateTime.Now;
+                _context.Urls.Add(url);
                 _context.SaveChanges();
             }
         }
@@ -70,5 +87,12 @@ namespace gsdetal.Services.Implementations
                 _context.SaveChanges();
             }
         }
+
+
+        public bool IsUrlExist(string url)
+        {
+            return _context.Urls.Any(u => u.url == url);
+        }
+
     }
 }

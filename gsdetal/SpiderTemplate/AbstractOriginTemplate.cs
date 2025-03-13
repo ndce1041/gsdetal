@@ -16,17 +16,23 @@ namespace gsdetal.SpiderTemplate
 {
     abstract class AbstractOriginTemplate : IOriginTemplate
     {
+        public abstract string Match { get; set; }
+        public abstract string TemplateName { get; set; }
+
+        private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);  // 实例锁
         protected IItemdetailService _itemService;
         protected IUrlService _urlService;
         static HttpClient? client;
 
         public Itemdetail? tochange;   // 保存当前正在处理的itemdetail   可传入方便修改半成品
 
+        public MyDBContext dbcontext;   
+
         protected string _url;
 
         protected AbstractOriginTemplate()
         {
-            var dbcontext = new MyDBContext();
+            dbcontext = new MyDBContext();
             _itemService = new ItemdetailService(dbcontext); 
             _urlService = new UrlService(dbcontext);
 
@@ -82,37 +88,45 @@ namespace gsdetal.SpiderTemplate
                 return "";
             }
         }
-        public abstract Task AnalyseBody(Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);
+        public abstract Task AnalyseBody(string _url ,Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService);
         /// <summary>
         /// 解析页面内容并保存
         /// tochange 为传入的可能附带信息的itemdetail 当只传入url时为null
         /// </summary>
         /// <returns></returns>
-        public async Task Run()
-        {
 
-            if (tochange == null)
-            {
-                await AnalyseBody(await GetBody(_url), null, _urlService, _itemService);
-            }
-            else
-            {
-                await AnalyseBody(await GetBody(tochange.url), tochange, _urlService, _itemService);
-            }
-
-
-        }
 
         public Func<Task> GetTask(Itemdetail itemdetail)
         {
-            tochange = itemdetail;
-            return Run;
+
+            return async () =>
+            {
+                await semaphore.WaitAsync(); // 异步等待锁
+                try
+                {
+                    await AnalyseBody( null,await GetBody(itemdetail.url), itemdetail, _urlService, _itemService);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            };
         }
 
         public Func<Task> GetTask(string url)
         {
-            _url = url;
-            return Run;
+            return async () =>
+            {
+                await semaphore.WaitAsync(); // 异步等待锁
+                try
+                {
+                    await AnalyseBody(url,await GetBody(url),null, _urlService, _itemService);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            };
         }
 
     }

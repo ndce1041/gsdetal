@@ -20,6 +20,6 @@ namespace gsdetal.Models
         public string? price { get; set; }
         public string? status { get; set; }
         // 记录更新时间
-        public string updatetime { get; set; }
+        public DateTime? updatetime { get; set; }
     }
 }

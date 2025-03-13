@@ -9,9 +9,10 @@ using gsdetal.Services;
 using gsdetal.Models;
 
 using System.IO;
+using gsdetal.Services.Implementations;
 
 
-namespace gsdetal.SpiderTemplate
+namespace gsdetal.SpiderTemplate.Imple
 {
     class ThumbnailTemplate : AbstractOriginTemplate
     {
@@ -23,15 +24,21 @@ namespace gsdetal.SpiderTemplate
         string filetype;
         string PATH = "Static";
 
+        public override string Match { get; set; } = "null";
+        public override string TemplateName { get; set; } = "Thumbnail";
+
+        public ThumbnailService _thumbnailService;
 
         bool isDebug = false;
 
         public ThumbnailTemplate() : base() {
-            
+            _thumbnailService = new ThumbnailService(dbcontext);
+
         }
 
         public ThumbnailTemplate(string debug) : base()
         {
+            _thumbnailService = new ThumbnailService(dbcontext);
             if (debug == "debug")
             {
                 isDebug = true;
@@ -41,14 +48,20 @@ namespace gsdetal.SpiderTemplate
 
         public override async Task<object> GetBody(string url)
         {
-            if (tochange == null)
-            {
-                throw new ArgumentNullException(nameof(tochange));
-            }
-            url = tochange.thumbnailurl;
             //url = "https:" + url;
             var client = GetHttpClient();
-            var response = await client.GetAsync(url);
+            HttpResponseMessage response = null;
+
+            try
+            {
+                response = await client.GetAsync(url);
+            }catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+            // 等待
 
             // 从url结尾获取文件后缀
             filetype = url.Split('.').Last();
@@ -69,15 +82,11 @@ namespace gsdetal.SpiderTemplate
 
 
 
-        public override async Task AnalyseBody(Object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService)
+        public override async Task AnalyseBody(string _url, object body, Itemdetail? tochange, IUrlService urlService, IItemdetailService itemService)
         {
             /// 保存缩略图并更新数据库
             /// 
-
-            if (tochange == null)
-            {
-                throw new ArgumentNullException(nameof(tochange));
-            }
+            
 
             if (body == null)
             {
@@ -99,7 +108,6 @@ namespace gsdetal.SpiderTemplate
 
 
 
-            tochange.thumbnailpath = filePath;
 
             if (isDebug)
             {
@@ -107,7 +115,7 @@ namespace gsdetal.SpiderTemplate
             }
             else
             {
-                itemService.UpdateItemDetail(tochange);
+                _thumbnailService.UpdateUrl(_url, fileName);
             }
 
 

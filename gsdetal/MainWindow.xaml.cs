@@ -32,6 +32,7 @@ using gsdetal.MainLogic;
 using gsdetal.MainViewModel;
 
 using gsdetal.SpiderTemplate;
+using gsdetal.SpiderTemplate.Imple;
 using gsdetal.Models;
 using gsdetal.Services;
 using gsdetal.Services.Implementations;
@@ -62,10 +63,11 @@ namespace gsdetal
             MyDBContext context = new();
             IItemdetailService itemService = new ItemdetailService(context);
             IUrlService urlService = new UrlService(context);
+            IThumbnailService thumbnailService = new ThumbnailService(context);
 
 
             // 测试
-            var picurlstr = "//itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
+            var picurlstr = "https://itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
 
 
             var mainurl = "https://runway-webstore.com/ap/item/i/m/0124503006";
@@ -75,14 +77,31 @@ namespace gsdetal
 
             IOriginTemplate No1Template = new NO1Template("debug");
 
+
+
             //Func<Task> task = No1Template.GetTask(mainurl);
 
             //No1Template.Run();
 
-            Itemdetail itl = new Itemdetail();
-            itl.thumbnailurl = picurlstr;
+            //Itemdetail itl = new Itemdetail();
+            //itl.thumbnailurl = picurlstr;
 
-            template.GetTask(itl)();
+            //template.GetTask(itl)();
+
+
+            runTime runtime = new();
+
+            runtime.StartThumbnailTask();
+
+
+            //var umr = runtime.umr;
+            ////umr.AddUrl(mainurl);
+            ///
+
+            //thumbnailService.AddUrl(picurlstr);
+            //var ans = thumbnailService.GetPathByUrl(picurlstr);
+            //var ans2 = thumbnailService.GetUrlThatNoFile();
+            //thumbnailService.UpdateUrl(picurlstr, "");
 
 
             Console.WriteLine("end");

@@ -12,9 +12,13 @@ namespace gsdetal.Services.Implementations
     {
         private readonly MyDBContext _context;
 
+        private ThumbnailService _thumbnailService;
+
+
         public ItemdetailService(MyDBContext context)
         {
             _context = context;
+            _thumbnailService = new ThumbnailService(_context);
         }
 
         // 获取商品详情
@@ -60,11 +64,13 @@ namespace gsdetal.Services.Implementations
                 if (!string.IsNullOrEmpty(itemdetail.thumbnailurl))
                 {
                     existingItem.thumbnailurl = itemdetail.thumbnailurl;
+                    _thumbnailService.AddUrl(itemdetail.thumbnailurl);   // 添加缩略图
                 }
-                if (!string.IsNullOrEmpty(itemdetail.thumbnailpath))
-                {
-                    existingItem.thumbnailpath = itemdetail.thumbnailpath;
-                }
+                // thumbnailpath字段废弃
+                //if (!string.IsNullOrEmpty(itemdetail.thumbnailpath))
+                //{
+                //    existingItem.thumbnailpath = itemdetail.thumbnailpath;
+                //}
                 if (!string.IsNullOrEmpty(itemdetail.tip))
                 {
                     existingItem.tip = itemdetail.tip;
@@ -82,6 +88,7 @@ namespace gsdetal.Services.Implementations
                 if (itemdetail.url != null && itemdetail.color != null && itemdetail.size != null)
                 {
                     _context.Itemdetails.Add(itemdetail);
+                    _thumbnailService.AddUrl(itemdetail.thumbnailurl);   // 添加缩略图
                 }
                 else
                 {
@@ -119,11 +126,8 @@ namespace gsdetal.Services.Implementations
         // 获取缩略图位置为空的 id + 缩略图url 其余字段为空 不取
         public List<Itemdetail> GetItemThatEmpty()
         {
-            return _context.Itemdetails.Select(item => new Itemdetail
-            {
-                Id = item.Id,
-                thumbnailurl = item.thumbnailurl,
-            }).Where(i => string.IsNullOrEmpty(i.thumbnailpath)).ToList();
+            // 废弃
+            return new List<Itemdetail>();
 
         }
 
