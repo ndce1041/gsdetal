@@ -101,7 +101,15 @@ namespace gsdetal.MainLogic
         {
             foreach (var task in taskList.GetConsumingEnumerable())
             {
-                await task();
+                try
+                {
+                    await task();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
                 Interlocked.Increment(ref completedTasks);
                 //Console.WriteLine($"Completed {completedTasks} of {totalTasks} tasks.");
             }

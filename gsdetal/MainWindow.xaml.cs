@@ -52,59 +52,64 @@ namespace gsdetal
         //public TextFileProcessor textFileProcessor = new("./save.txt");
 
         //public ReptileWorker rwoker;
-
+        MainViewModel.MainViewModel mainViewModel = new();
         public string log = "log:\n";
         public MainWindow()
         {
-            //InitializeComponent();
-            //MainViewModel.MainViewModel mainViewModel = new();
-            //this.DataContext = mainViewModel;
+            InitializeComponent();
+            this.DataContext = mainViewModel;
+        }
 
-            MyDBContext context = new();
-            IItemdetailService itemService = new ItemdetailService(context);
-            IUrlService urlService = new UrlService(context);
-            IThumbnailService thumbnailService = new ThumbnailService(context);
+         private void LeftDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+         {
+                if (mainViewModel.selectedItem != null)
+                {
+                    // 行选中回调
+                    // TODO 变更显示
+                }
+         }
 
-
-            // 测试
-            var picurlstr = "https://itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
-
-
-            var mainurl = "https://runway-webstore.com/ap/item/i/m/0124503006";
-
-
-            IOriginTemplate template = new ThumbnailTemplate("debug");
-
-            IOriginTemplate No1Template = new NO1Template("debug");
+        //MyDBContext context = new();
+        //IItemdetailService itemService = new ItemdetailService(context);
+        //IUrlService urlService = new UrlService(context);
+        //IThumbnailService thumbnailService = new ThumbnailService(context);
 
 
-
-            //Func<Task> task = No1Template.GetTask(mainurl);
-
-            //No1Template.Run();
-
-            //Itemdetail itl = new Itemdetail();
-            //itl.thumbnailurl = picurlstr;
-
-            //template.GetTask(itl)();
+        //// 测试
+        //var picurlstr = "https://itemimg-rcw.runway-webstore.net/itemimg/MK010/A0MK0000BIUN/02_M09-72.jpg";
 
 
-            runTime runtime = new();
-
-            runtime.StartThumbnailTask();
+        //var mainurl = "https://runway-webstore.com/ap/item/i/m/0124503006";
 
 
-            //var umr = runtime.umr;
-            ////umr.AddUrl(mainurl);
-            ///
+        //IOriginTemplate template = new ThumbnailTemplate("debug");
 
-            //thumbnailService.AddUrl(picurlstr);
-            //var ans = thumbnailService.GetPathByUrl(picurlstr);
-            //var ans2 = thumbnailService.GetUrlThatNoFile();
-            //thumbnailService.UpdateUrl(picurlstr, "");
+        //IOriginTemplate No1Template = new NO1Template("debug");
 
 
-            Console.WriteLine("end");
+
+        //Func<Task> task = No1Template.GetTask(mainurl);
+
+        //No1Template.Run();
+
+        //Itemdetail itl = new Itemdetail();
+        //itl.thumbnailurl = picurlstr;
+
+        //template.GetTask(itl)();
+
+
+
+
+        //var umr = runtime.umr;
+        ////umr.AddUrl(mainurl);
+        ///
+
+        //thumbnailService.AddUrl(picurlstr);
+        //var ans = thumbnailService.GetPathByUrl(picurlstr);
+        //var ans2 = thumbnailService.GetUrlThatNoFile();
+        //thumbnailService.UpdateUrl(picurlstr, "");
+
+
 
 
 
@@ -184,7 +189,7 @@ namespace gsdetal
             //    mainDataGrid.ItemsSource = rwoker.items;
 
             //}
-        }
+    }
 
 
 
@@ -240,7 +245,7 @@ namespace gsdetal
         //        log += ex.Message;
         //    }
         //}
-    }
+    
 
 
 

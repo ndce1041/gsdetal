@@ -69,7 +69,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <DataGrid Name="mainDataGrid" Grid.Column="0" AutoGenerateColumns="False" ItemsSource="{Binding Items}">
+            <!--            <DataGrid Name="mainDataGrid" Grid.Column="0" AutoGenerateColumns="False" ItemsSource="{Binding Items}">
                 <DataGrid.Columns>
 
                     <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected}">
@@ -87,12 +87,12 @@
                         </DataGridCheckBoxColumn.EditingElementStyle>
 
                     </DataGridCheckBoxColumn>
-                    <DataGridTextColumn Header="序号"/>
+                    <DataGridTextColumn Header="Order"/>
                     <DataGridTemplateColumn Header="Url" Width="90">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Label Content="{Binding Url}"/>
-                                <!-- <Button Content="delet" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=DataContext.RemoveUrlCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Tag="{Binding Url}" Height="20" Width="40" Padding="1" Grid.Row="1" HorizontalAlignment="Center"/>-->
+                  
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -100,13 +100,47 @@
                     <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*" IsReadOnly="True"/>
                     <DataGridTextColumn Header="State" Binding="{Binding State}" Width="*" IsReadOnly="True"/>
                 </DataGrid.Columns>
+            </DataGrid>-->
+
+
+
+            <DataGrid Name="LeftDataGrid" Grid.Row="0" AutoGenerateColumns="False" 
+              ItemsSource="{Binding Items}" 
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+              SelectionChanged="LeftDataGrid_SelectionChanged"
+              SelectionMode="Single"
+              SelectionUnit="FullRow">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridCheckBoxColumn.ElementStyle>
+                            <Style TargetType="CheckBox">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridCheckBoxColumn.ElementStyle>
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="Order" Binding="{Binding Order, UpdateSourceTrigger=PropertyChanged}"/>
+                    <DataGridTemplateColumn Header="Url" Width="90">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Label Content="{Binding Url}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Title}" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="State" Binding="{Binding Status}" Width="*" IsReadOnly="True"/>
+                </DataGrid.Columns>
             </DataGrid>
 
-            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Pt}" Grid.Column="1">
+
+
+
+            <DataGrid AutoGenerateColumns="False" Grid.Column="1">
                 <DataGrid.Columns>
                     <!--这里更改存储方式，统一存储在数据库中 主键为url-->
                     <DataGridTemplateColumn Header="图片"></DataGridTemplateColumn>
-                    <DataGridTextColumn Header="颜色" Binding="{Binding Style}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="颜色" IsReadOnly="True"/>
                     <DataGridTextColumn Header="尺码" IsReadOnly="True"/>
                     <DataGridTextColumn Header="状态" IsReadOnly="True"/>
                     <DataGridTextColumn Header="注备" />
@@ -124,7 +158,7 @@
                 <ColumnDefinition Width="380*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Content="删除选中" Grid.Column="0" Margin="5"/>
+            <Button Content="删除选中" Command="{Binding GetSelectedItems_Click}" Grid.Column="0" Margin="5"/>
 
             <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>

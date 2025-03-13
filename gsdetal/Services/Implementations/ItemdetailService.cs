@@ -42,7 +42,7 @@ namespace gsdetal.Services.Implementations
             Itemdetail? existingItem;
 
             // 如果存在id
-            if (itemdetail != null)
+            if (itemdetail.Id != 0)
             {
                 existingItem = _context.Itemdetails.FirstOrDefault(i => i.Id == itemdetail.Id);
             }

@@ -25,6 +25,15 @@ namespace gsdetal.Services.Implementations
                 .ToDictionary(g => g.Key, g => g.ToList());
         }
 
+
+        public List<Url> GetAllUrlOrdered()
+        {
+            return _context.Urls
+                .OrderBy(u => u.order)
+                .ToList();
+        }
+
+
         // 获取某一模板下的所有url
         public List<Url> GetUrlByGroup(string group)
         {

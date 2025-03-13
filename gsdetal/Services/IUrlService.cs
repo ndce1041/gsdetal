@@ -14,6 +14,7 @@ namespace gsdetal.Services
 
         public List<Url> GetUrlByGroup(string group);  // 获取某一模板下的所有url
 
+        public List<Url> GetAllUrlOrdered();
         public void AddUrl(Url url);  // 添加url
 
         public void UpdateUrl(Url url);  // 更新url

@@ -14,22 +14,22 @@ using gsdetal.Services.Implementations;
 using gsdetal.Services;
 
 using gsdetal.Models;
+using gsdetal.Models.ObservableModels;
+using System.Windows;
+using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace gsdetal.MainViewModel
 {
     public partial class MainViewModel : ObservableObject
     {
-        public ObservableCollection<Peritem> Items { get; set; }
+        public ObservableCollection<ObUrl> Items { get; set; }   // 左侧列表数据
 
         [ObservableProperty]
-        private string? newurl;
+        private string? newurl;  // 新链接输入框绑定
 
-        // private List<string> urls = new();
-
-        //private urlManage umr = new();  // 链接管理器
-
-        //private ReptileWorker reptileWorker = new(30, null, null);  // 爬虫工作器
-
+        [ObservableProperty]
+        public ObUrl? selectedItem;  // 选中的行
 
         MyDBContext context = new();
         IItemdetailService itemService;
@@ -44,21 +44,39 @@ namespace gsdetal.MainViewModel
             itemService = new ItemdetailService(context);
             urlService = new UrlService(context);
 
+            Items = new ObservableCollection<ObUrl>();
+            
+
             runtime = new();
             umr = runtime.umr;
+
+
+            // 
+
+            //TODO 更新数据  runtime
+            runtime.run();
+
+
+            // 从数据库中读取数据
+
+            List<Url> urls = urlService.GetAllUrlOrdered();
+
+
+            ObUrl temp;
+            foreach (var url in urls)
+            {
+                {
+                    temp = new ObUrl(url);
+
+                    temp.PropertyChanged += Item_PropertyChanged;
+
+                    Items.Add(temp);
+                }
+            }
         }
 
-        // 在新链接发生变化时触发 规范化
-        //private void OnNewurlChanged( string value)
-        //{
-        //    bool hasWhitespace = Regex.IsMatch(value, @"\s");
-        //    if (hasWhitespace)
-        //    {
-        //        Newurl = Regex.Replace(value, @"\s+", "");
-        //    }
-        //}
         [RelayCommand]
-        private void AddUrl(object sender)
+        private void AddUrl(object sender)  // 添加新链接按钮回调
         {
             if (Newurl != null)
             {
@@ -79,6 +97,33 @@ namespace gsdetal.MainViewModel
             // 删除对应的数据
             Items.Remove(Items.Where(x => x.Url == tag).FirstOrDefault());
         }
+
+
+        [RelayCommand]
+        private void GetSelectedItems_Click(object sender)   // 获取所有选中并删除的按钮回调
+        {
+            // 获取所有选中项的url
+            var selectedIds = Items.Where(item => item.IsSelected).Select(item => item.Url).ToList();
+
+            // TODO 删除选中
+        }
+
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)     // Order值变更回调
+        {
+            if (e.PropertyName == "Order" && sender is ObUrl item)
+            {
+                //TODO 在数据库中更新 Order值变更回调
+                
+            }
+            else if (e.PropertyName == "IsSelected" && sender is ObUrl selectedItem)
+            {
+                // IsSelected变更回调（可选）
+            }
+        }
+
+
+
+
 
 
     }
