@@ -12,7 +12,7 @@ namespace gsdetal.SpiderTemplate.Imple
 {
     internal class NO1Template : AbstractOriginTemplate
     {
-        public override string Match { get; set; } = @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}$";   // 重要标识符  自身对应url的正则表达式  需要排除冗余信息
+        public override string Match { get; set; } = @"^https:\/\/runway-webstore\.com\/ap\/item\/i\/m\/\d{10}";   // 重要标识符  自身对应url的正则表达式  需要排除冗余信息
         public override string TemplateName { get; set; } = "NO1";   // 重要标识符  模板名称 可以任意取 但是要保证唯一性
 
         SpiderTools tools = new SpiderTools();    // 工具类   其中只有一个方法  TraverseAndConcatenateText  用于遍历节点并拼接文本  当信息分散在层次结构中时使用
@@ -57,9 +57,9 @@ namespace gsdetal.SpiderTemplate.Imple
 
             if (info_percolor == null) { throw new Exception("no percolor info"); }
 
-            
 
-            ///构造数据行
+
+            ///构造数据行    此阶段只要一下信息  url 价格 标题 状态
             Url urlinf = new();
             urlinf.url = _url;
             urlinf.price = prise == null ? null : tools.TraverseAndConcatenateText(prise);

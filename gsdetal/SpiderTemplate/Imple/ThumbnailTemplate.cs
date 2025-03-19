@@ -107,7 +107,9 @@ namespace gsdetal.SpiderTemplate.Imple
             }
             else
             {
-                _thumbnailService.UpdateUrl(_url, fileName);
+                
+
+                _thumbnailService.UpdateUrl(_url, filePath);
             }
 
 

@@ -83,7 +83,7 @@ namespace gsdetal.MainLogic
 
             var newUrl = new Url
             {
-                url = url,
+                url = Regex.Match(url, TemplateDict[templatetype]).Groups[1].Value,
                 templatetype = templatetype,
                 order = string.Empty,
                 title = string.Empty,

@@ -22,9 +22,9 @@ namespace gsdetal.Services.Implementations
         }
 
         // 获取商品详情
-        public List<Itemdetail> GetItemDetailByUrl()
+        public List<Itemdetail> GetItemDetailByUrl(string _url)
         {
-            return _context.Itemdetails.ToList();
+            return _context.Itemdetails.Where(i => i.url == _url).ToList();
         }
 
         // 添加商品详情
@@ -104,13 +104,9 @@ namespace gsdetal.Services.Implementations
 
 
         // 更新商品备注
-        public void UpdateTipByUrl(string tip)
+        public void UpdateTipById(int _id ,string _tip)
         {
-            var itemdetails = _context.Itemdetails.Where(i => i.tip == tip).ToList();
-            foreach (var itemdetail in itemdetails)
-            {
-                itemdetail.tip = tip;
-            }
+            _context.Itemdetails.FirstOrDefault(i => i.Id == _id ).tip = _tip;
             _context.SaveChanges();
         }
 

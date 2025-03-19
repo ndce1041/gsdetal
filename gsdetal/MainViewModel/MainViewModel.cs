@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,7 +24,11 @@ namespace gsdetal.MainViewModel
 {
     public partial class MainViewModel : ObservableObject
     {
+
         public ObservableCollection<ObUrl> Items { get; set; }   // 左侧列表数据
+
+
+        public ObservableCollection<ObItemdetail> ItemsDetail { get; set; }  // 右侧列表
 
         [ObservableProperty]
         private string? newurl;  // 新链接输入框绑定
@@ -34,18 +39,21 @@ namespace gsdetal.MainViewModel
         MyDBContext context = new();
         IItemdetailService itemService;
         IUrlService urlService;
+        IThumbnailService thumbnailService;
 
         runTime runtime;
         urlManage umr;
 
         public MainViewModel()
         {
-            
+
             itemService = new ItemdetailService(context);
             urlService = new UrlService(context);
+            thumbnailService = new ThumbnailService(context);
 
             Items = new ObservableCollection<ObUrl>();
-            
+            ItemsDetail = new ObservableCollection<ObItemdetail>();
+
 
             runtime = new();
             umr = runtime.umr;
@@ -80,8 +88,15 @@ namespace gsdetal.MainViewModel
         {
             if (Newurl != null)
             {
-                umr.AddUrl(Newurl);  // 添加新链接
-            }
+                try
+                {
+                    umr.AddUrl(Newurl);  // 添加新链接
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+                }
             Newurl = "";
         }
 
@@ -110,14 +125,44 @@ namespace gsdetal.MainViewModel
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)     // Order值变更回调
         {
-            if (e.PropertyName == "Order" && sender is ObUrl item)
+            if (e.PropertyName == "Order" && sender is ObUrl _item)
             {
                 //TODO 在数据库中更新 Order值变更回调
-                
+                urlService.UpdateOrderByUrl(_item.Url, _item.Order);
             }
             else if (e.PropertyName == "IsSelected" && sender is ObUrl selectedItem)
             {
                 // IsSelected变更回调（可选）
+            }
+        }
+
+
+        public void ReNewRightDataGrid() {
+            var selectedurl = selectedItem.Url;
+
+            ObItemdetail temp;
+            List<Itemdetail> items = itemService.GetItemDetailByUrl(selectedurl);
+            // 清空右侧列表
+            ItemsDetail.Clear();
+            foreach (var _itemdetail in items)
+            {
+                temp = new ObItemdetail(_itemdetail);
+                var _path = thumbnailService.GetPathByUrl(_itemdetail.thumbnailurl);
+                
+                temp.thumbnailpath = Path.GetFullPath(_path);
+
+                temp.PropertyChanged += ItemDetail_PropertyChanged;
+
+                ItemsDetail.Add(temp);
+            }
+        }
+
+
+        public void ItemDetail_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Tip" && sender is ObItemdetail _itemdetail)
+            {
+                itemService.UpdateTipById((int)_itemdetail.id,_itemdetail.Tip);
             }
         }
 

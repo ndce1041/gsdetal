@@ -38,6 +38,7 @@ using gsdetal.Services;
 using gsdetal.Services.Implementations;
 
 using gsdetal.DBViewModel;
+using gsdetal.Models.ObservableModels;
 
 namespace gsdetal
 {
@@ -52,20 +53,39 @@ namespace gsdetal
         //public TextFileProcessor textFileProcessor = new("./save.txt");
 
         //public ReptileWorker rwoker;
+
+
+
+
+
         MainViewModel.MainViewModel mainViewModel = new();
         public string log = "log:\n";
         public MainWindow()
         {
+
             InitializeComponent();
+
+
+
+
             this.DataContext = mainViewModel;
+
+
+            string url = "https://snidel.com/Form/Product/ProductDetail.aspx?shop=0&pid=SWFT251057&vid=&bid=SND01&cid=&_type=&cat=&swrd=";
+
+            //var AbstractOriginTemplate = new SNIDELTemplate();
+            //AbstractOriginTemplate.GetTask(url)();
+
+
+
+
         }
 
          private void LeftDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
          {
                 if (mainViewModel.selectedItem != null)
                 {
-                    // 行选中回调
-                    // TODO 变更显示
+                    mainViewModel.ReNewRightDataGrid();
                 }
          }
 

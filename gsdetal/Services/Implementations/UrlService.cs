@@ -28,9 +28,11 @@ namespace gsdetal.Services.Implementations
 
         public List<Url> GetAllUrlOrdered()
         {
+            // 按order字段排序  如果为空则排在最后,注意这里的order字段是string类型
             return _context.Urls
-                .OrderBy(u => u.order)
+                .OrderBy(u => u.order == null ? "9999" : u.order)
                 .ToList();
+
         }
 
 
@@ -102,6 +104,14 @@ namespace gsdetal.Services.Implementations
         {
             return _context.Urls.Any(u => u.url == url);
         }
+
+
+        public void UpdateOrderByUrl(string _url, string _order)
+        {
+            _context.Urls.FirstOrDefault(i => i.url == _url).order = (string)_order;
+            _context.SaveChanges();
+        }
+
 
     }
 }

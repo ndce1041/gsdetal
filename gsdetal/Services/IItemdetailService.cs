@@ -12,14 +12,14 @@ namespace gsdetal.Services
     {
 
         // search
-        public List<Itemdetail> GetItemDetailByUrl();  // 获取商品详情
+        public List<Itemdetail> GetItemDetailByUrl(string _url);  // 获取商品详情
 
         // add
         public void AddItemDetailByUrl( List<Itemdetail> itemdetails);  // 添加商品详情
 
         // update
         public void UpdateItemDetail(Itemdetail itemdetail);  // 更新商品详情
-        public void UpdateTipByUrl(String tip);  // 更新商品备注
+        public void UpdateTipById(int id,String tip);  // 更新商品备注
         // delete
         public void DeleteItemDetailByUrl(List<String> urls);  // 删除商品详情
 

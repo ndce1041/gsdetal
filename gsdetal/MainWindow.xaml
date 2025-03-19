@@ -136,15 +136,29 @@
 
 
 
-            <DataGrid AutoGenerateColumns="False" Grid.Column="1">
+            <DataGrid AutoGenerateColumns="False" Grid.Column="1" ItemsSource="{Binding ItemsDetail}">
                 <DataGrid.Columns>
-                    <!--这里更改存储方式，统一存储在数据库中 主键为url-->
-                    <DataGridTemplateColumn Header="图片"></DataGridTemplateColumn>
-                    <DataGridTextColumn Header="颜色" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="尺码" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="状态" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="注备" />
+                    <!-- 图片列 -->
+                    <DataGridTemplateColumn Header="图片" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Thumbnailpath}" 
+                           Width="60" 
+                           Height="60"
+                           Stretch="UniformToFill"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
+                    <DataGridTextColumn Header="颜色" Binding="{Binding Color}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="尺码" Binding="{Binding Size}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="状态" Binding="{Binding State}" IsReadOnly="True"/>
+
+                    <!-- 备注列 -->
+                    <DataGridTextColumn Header="备注" 
+                            Binding="{Binding Tip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </DataGrid.Columns>
             </DataGrid>
 

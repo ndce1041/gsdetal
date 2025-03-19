@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -29,6 +30,10 @@ namespace gsdetal.SpiderTemplate
 
         public MyDBContext dbcontext;   
 
+        public String _encodingStr { get; set; } = "utf-8";
+
+        Encoding encoding;
+
         protected string _url;
 
         protected AbstractOriginTemplate()
@@ -43,9 +48,7 @@ namespace gsdetal.SpiderTemplate
 
         protected HttpClient GetHttpClient()
         {
-            ///
-            /// 单例获取HttpClient
-            ///
+            // 单例获取HttpClient
             if (client != null)
             {
                 return client;
@@ -54,16 +57,44 @@ namespace gsdetal.SpiderTemplate
             int timeout = 30;
             string? UA = null;   // TODO 从配置文件中读取
 
-            string DefaultUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36";
+            string DefaultUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0";
 
-            client = new HttpClient();
-            client.Timeout = timeout == null ? TimeSpan.FromSeconds(30) : TimeSpan.FromSeconds((int)timeout);
-            client.DefaultRequestHeaders.Add("User-Agent", UA == null ? DefaultUA : UA);
-            client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
-            client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br, zstd");
-            client.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-            client.DefaultRequestHeaders.Add("Cache-Control", "max-age=0");
-            client.DefaultRequestHeaders.Remove("Connection");
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
+            client = new HttpClient(new HttpClientHandler
+            {
+                // 启用HTTP/2.0
+                MaxConnectionsPerServer = 10, // 可以根据需要调整
+                SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13,
+                AutomaticDecompression = DecompressionMethods.All
+            });
+
+            client.DefaultRequestVersion = HttpVersion.Version20; // 设置默认版本为HTTP/2.0
+
+            client.Timeout = TimeSpan.FromSeconds(timeout);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(UA ?? DefaultUA);
+            client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+            client.DefaultRequestHeaders.AcceptEncoding.ParseAdd("gzip, deflate, br, zstd");
+            client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("zh-CN,zh;q=0.9,en;q=0.8");
+            client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+            {
+                NoCache = true,
+            };
+            client.DefaultRequestHeaders.ConnectionClose = false; // 保持连接
+
+            // 添加更多浏览器常见的请求头
+            client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-origin");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "navigate");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-User", "?1");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "document");
+
+            client.DefaultRequestHeaders.Add("Sec-Ch-Ua", "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Microsoft Edge\";v=\"134\"");
+            client.DefaultRequestHeaders.Add("Sec-Ch-Ua-Mobile", "?0");
+            client.DefaultRequestHeaders.Add("Sec-Ch-Ua-Platform", "\"Windows\"");
+
+            client.DefaultRequestHeaders.Add("Pragma", "no-cache");
+            client.DefaultRequestHeaders.Add("Priority", "u=0, i");
 
             return client;
         }
@@ -85,17 +116,22 @@ namespace gsdetal.SpiderTemplate
 
 
             HttpClient client = GetHttpClient();
+
+
+
             var response = await client.GetAsync(url);
+
+            encoding = Encoding.GetEncoding(_encodingStr);
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return  encoding.GetString( await response.Content.ReadAsByteArrayAsync());
                 //ansJson += body;
             }
             else
             {
-                // TODO: 保存错误信息 log
-                return "";
+                // 返回错误信息
+                return response.StatusCode;
             }
         }
         public abstract Task AnalyseBody(string _url ,Object body, IUrlService urlService, IItemdetailService itemService);
